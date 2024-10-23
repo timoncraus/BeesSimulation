@@ -10,9 +10,9 @@ public class Habitat {
 
     static Random rand = new Random();
     
-    public void generateInitial(Group playground) {
+    public void generateInitial(Group playground, double countSec1) {
         for(int i = 0; i < initialNumberBee; i++) {
-            addBee(new WorkerBee(imageWidth), playground);
+            addBee(new WorkerBee(imageWidth, countSec1), playground);
             WorkerBee.count += 1;
         }
     }
@@ -23,8 +23,20 @@ public class Habitat {
     }
 
     public void update(double countSec, Group playground) {
-        DroneBee.update(playground, this);
-        WorkerBee.update(playground, this);
+        DroneBee.update(playground, this, countSec);
+        WorkerBee.update(playground, this, countSec);
+
+        int n = bees.size();
+        int deletedCount = 0;
+        Bee currentBee;
+        for(int i = 0; i < n; i++) {
+            currentBee = bees.get(i - deletedCount);
+            if(currentBee.isDeleted(countSec)) {
+                playground.getChildren().remove(currentBee.getRectangle());
+                bees.remove(i - deletedCount);
+                deletedCount++;
+            }
+        }
     }
 
     public void deleteAll(Group playground) {
