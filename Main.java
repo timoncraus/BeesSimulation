@@ -61,7 +61,7 @@ public class Main extends Application {
         });
 
         stage.setScene(scene);
-        stage.setTitle("Laba 5");
+        stage.setTitle("Симуляция жизни пчёл");
         stage.show();
     }
 
