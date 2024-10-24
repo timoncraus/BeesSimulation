@@ -1,6 +1,11 @@
+import java.util.Arrays;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -8,12 +13,14 @@ import javafx.scene.text.Font;
 
 public class UserInterface {
     static final double boxGap = 10;
+    static final String allowedCharacters = "0123456789 .";
 
-    public Label timeText, droneText, workerText, birthProbText;
+    public Label timeText, droneText, workerText, birthProbText, droneLifeTimeText;
     VBox interfaceVBox, infoTextVBox;
-    HBox playPauseHBox, changeBirthProbHBox;
+    HBox playPauseHBox, changeBirthProbHBox, droneLifeTimeHBox;
     Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton;
     ComboBox<String> probsComboBox;
+    TextField droneLifeTimeInput;
 
     public UserInterface(Main main) {
         timeText = new Label("0,00 сек");
@@ -24,8 +31,16 @@ public class UserInterface {
         makeShowTimeButton();
         makeShowInfoButton();
         makeChangeBirthProbHBox();
+        makeDroneLifeTimeHBox();
 
-        interfaceVBox = new VBox(boxGap, timeText, infoTextVBox, playPauseHBox, showTimeButton, showInfoButton, changeBirthProbHBox);
+        interfaceVBox = new VBox(boxGap, 
+                                timeText, 
+                                infoTextVBox, 
+                                playPauseHBox, 
+                                showTimeButton, 
+                                showInfoButton, 
+                                changeBirthProbHBox,
+                                droneLifeTimeHBox);
     }
 
     public VBox getInterfaceVBox() {
@@ -104,11 +119,51 @@ public class UserInterface {
         for(int i = 0; i <= 100; i += 10) {
             probsComboBox.getItems().add(i + "%");
         }
-        probsComboBox.setValue("70%");
+        probsComboBox.setValue(WorkerBee.birthProb * 100 + "%");
         probsComboBox.setOnAction(event -> setBirthProb(probsComboBox.getValue()));
 
         changeBirthProbHBox = new HBox(boxGap, birthProbText, probsComboBox);
     }
+
+    private void makeDroneLifeTimeHBox() {
+        droneLifeTimeText = new Label("Время жизни трутней:");
+
+        droneLifeTimeInput = new TextField(DroneBee.lifeTime / Main.frameSec + "");
+        droneLifeTimeInput.textProperty().addListener((obs, oldVal, newVal)-> {
+            DroneBee.lifeTime = setLifeTime(droneLifeTimeInput, oldVal, newVal) * Main.frameSec;
+        }) ;
+
+        droneLifeTimeHBox = new HBox(boxGap, droneLifeTimeText, droneLifeTimeInput);
+    }
+
+    private double setLifeTime(TextField input, String oldVal, String newVal) {
+        newVal.replace(",", ".");
+        if(newVal.length() > 0){
+            if(newVal.charAt(0) == '.') {
+                newVal = "0" + newVal;
+            }
+
+            char lastChar = newVal.charAt(newVal.length()-1);
+            long count = newVal.chars().filter(c -> c == '.').count();
+            if(!allowedCharacters.contains("" + lastChar) || count > 1) {
+                input.setText(oldVal);
+                return Double.parseDouble(oldVal);
+            }
+        }
+        else {
+            newVal = "0";
+        }
+        
+        try {
+            double num = Double.parseDouble(newVal);
+            input.setText(newVal);
+            return num;
+        }
+        catch(Exception e) {
+            return Double.parseDouble(oldVal);
+        }
+    }
+    
 
     private void setBirthProb(String probStrig) {
         WorkerBee.birthProb = Double.parseDouble(probStrig.replace("%", ""))/100;
