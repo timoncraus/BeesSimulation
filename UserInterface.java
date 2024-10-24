@@ -1,7 +1,3 @@
-import java.util.Arrays;
-
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -13,7 +9,7 @@ import javafx.scene.text.Font;
 
 public class UserInterface {
     static final double boxGap = 10;
-    static final String allowedCharacters = "0123456789 .";
+    static final String allowedChars = "0123456789.";
 
     public Label timeText, droneText, workerText, birthProbText, droneLifeTimeText;
     VBox interfaceVBox, infoTextVBox;
@@ -130,22 +126,28 @@ public class UserInterface {
 
         droneLifeTimeInput = new TextField(DroneBee.lifeTime / Main.frameSec + "");
         droneLifeTimeInput.textProperty().addListener((obs, oldVal, newVal)-> {
-            DroneBee.lifeTime = setLifeTime(droneLifeTimeInput, oldVal, newVal) * Main.frameSec;
-        }) ;
+            DroneBee.lifeTime = setDoubleInput(droneLifeTimeInput, oldVal, newVal) * Main.frameSec;
+        });
 
         droneLifeTimeHBox = new HBox(boxGap, droneLifeTimeText, droneLifeTimeInput);
     }
 
-    private double setLifeTime(TextField input, String oldVal, String newVal) {
+    private double setDoubleInput(TextField input, String oldVal, String newVal) {
         newVal.replace(",", ".");
         if(newVal.length() > 0){
             if(newVal.charAt(0) == '.') {
                 newVal = "0" + newVal;
             }
+            else if(newVal.length() > 1 && 
+                            newVal.charAt(0) == '0' && 
+                            allowedChars.contains("" + newVal.charAt(1)) && 
+                            newVal.charAt(1) != '.') {
+                newVal = newVal.substring(1, newVal.length());
+            }
 
             char lastChar = newVal.charAt(newVal.length()-1);
             long count = newVal.chars().filter(c -> c == '.').count();
-            if(!allowedCharacters.contains("" + lastChar) || count > 1) {
+            if(!allowedChars.contains("" + lastChar) || count > 1) {
                 input.setText(oldVal);
                 return Double.parseDouble(oldVal);
             }
