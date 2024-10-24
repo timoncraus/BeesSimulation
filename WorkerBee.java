@@ -5,8 +5,8 @@ public class WorkerBee extends Bee {
     static Image image = new Image("YellowBee.png");
     static double countSec = 0;
     static int count = 0;
-    static double birthSec = 3 * Main.frameSec;
-    static double lifeTime = 50 * Main.frameSec;
+    static double birthSec = 3;
+    static double lifeTime = 50;
     static double birthProb = 0.7;
 
     static double probability;
@@ -19,7 +19,7 @@ public class WorkerBee extends Bee {
         probability = Habitat.random(0, 1);
         
         WorkerBee.countSec += Main.frameSec;
-        if(probability <=  WorkerBee.birthProb && WorkerBee.countSec >= WorkerBee.birthSec) {
+        if(probability <=  WorkerBee.birthProb && WorkerBee.countSec >= WorkerBee.birthSec * Main.frameSec) {
             WorkerBee.countSec = 0;
             habitat.addBee(new WorkerBee(Habitat.imageWidth, countSec1), playground);
             WorkerBee.count += 1;
@@ -27,7 +27,7 @@ public class WorkerBee extends Bee {
     }
     
     public Boolean isDeleted(double countSec) {
-        if(countSec - this.birthday > WorkerBee.lifeTime) {
+        if(countSec - this.birthday > WorkerBee.lifeTime * Main.frameSec) {
             WorkerBee.count--;
             return true;
         }

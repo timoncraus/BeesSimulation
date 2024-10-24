@@ -12,16 +12,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    static public double frameSec = 0.07;
+
     static final double minWidthPlayground = 0;
     static final double widthPlayground = 500;
     static final double minHeightPlayground = 30;
     static final double heightPlayground = 500;
 
-    static final double widthWindow = 900;
-    static final double heightWindow = 500;
-
-    static final double frameSec = 0.07;
-    
+    static final double widthWindow = 1000;
+    static final double heightWindow = 600;
 
     Group playground;
     Rectangle background;
@@ -41,14 +40,8 @@ public class Main extends Application {
         playground = new Group(background);
         habitat = new Habitat();
         userInterface = new UserInterface(this);
-        timeLine = new Timeline(
-            new KeyFrame(Duration.seconds(frameSec), action -> {
-                habitat.update(countSec, playground);
-                countSec += frameSec;
-                userInterface.updateText(countSec);
-            })
-        );
-        timeLine.setCycleCount(100_000);
+
+        setNewTimer();
 
         root = new HBox(playground, userInterface.getInterfaceVBox());
         
@@ -90,6 +83,25 @@ public class Main extends Application {
             userInterface.togglePlayPauseButtons(true, false, true);
         }
         pauseGame = !pauseGame;
+    }
+
+    public void setNewTimer() {
+        boolean wasNull = false;
+        if(timeLine != null) {
+            timeLine.stop();
+            wasNull = true;
+        }
+        timeLine = new Timeline(
+            new KeyFrame(Duration.seconds(frameSec), action -> {
+                habitat.update(countSec, playground);
+                countSec += frameSec;
+                userInterface.updateText(countSec);
+            })
+        );
+        timeLine.setCycleCount(100_000);
+        if(wasNull) {
+            timeLine.play();
+        }
     }
 
     public static void main(String args[]) {

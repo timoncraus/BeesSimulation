@@ -1,8 +1,10 @@
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -11,12 +13,15 @@ public class UserInterface {
     static final double boxGap = 10;
     static final String allowedChars = "0123456789.";
 
-    public Label timeText, droneText, workerText, birthProbText, droneLifeTimeText;
+    ScrollPane scrollInterface;
+    public Label timeText, droneText, droneSecText, workerText, workerSecText, frameSecText, 
+                            birthProbText, birthMaxPartText, droneLifeTimeText, workerLifeTimeText, workerBirthSecText;
     VBox interfaceVBox, infoTextVBox;
-    HBox playPauseHBox, changeBirthProbHBox, droneLifeTimeHBox;
+    HBox playPauseHBox, frameSecHBox, changeBirthProbHBox, changeBirthMaxPartHBox, 
+                            droneLifeTimeHBox, workerLifeTimeHBox, workerBirthSecHBox;
     Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton;
-    ComboBox<String> probsComboBox;
-    TextField droneLifeTimeInput;
+    ComboBox<String> probsComboBox, partsComboBox;
+    TextField frameSecInput, droneLifeTimeInput, workerLifeTimeInput, workerBirthSecInput;
 
     public UserInterface(Main main) {
         timeText = new Label("0,00 сек");
@@ -26,27 +31,43 @@ public class UserInterface {
         makePlayPauseHBox(main);
         makeShowTimeButton();
         makeShowInfoButton();
+        makeChangeFrameSecHBox(main);
         makeChangeBirthProbHBox();
-        makeDroneLifeTimeHBox();
+        makeChangeBirthMaxPartHBox();
+        makeChangeDroneLifeTimeHBox();
+        makeChangeWorkerLifeTimeHBox();
+        makeChangeWorkerBirthSecHBox();
 
         interfaceVBox = new VBox(boxGap, 
                                 timeText, 
                                 infoTextVBox, 
                                 playPauseHBox, 
                                 showTimeButton, 
-                                showInfoButton, 
+                                showInfoButton,
+                                frameSecHBox, 
                                 changeBirthProbHBox,
-                                droneLifeTimeHBox);
+                                changeBirthMaxPartHBox,
+                                workerLifeTimeHBox,
+                                droneLifeTimeHBox,
+                                workerBirthSecHBox);
+        scrollInterface = new ScrollPane();
+        scrollInterface.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollInterface.setContent(interfaceVBox); 
+        HBox.setHgrow(scrollInterface, Priority.ALWAYS);
     }
 
-    public VBox getInterfaceVBox() {
-        return interfaceVBox;
+    public ScrollPane getInterfaceVBox() {
+        return scrollInterface;
     }
 
     public void updateText(double countSec) {
         timeText.setText(String.format("%.2f сек", countSec));
+
         workerText.setText("Количество рабочих пчёл: " + WorkerBee.count);
+        workerSecText.setText(String.format("Таймер рабочих пчёл: %.2f", WorkerBee.countSec));
+
         droneText.setText("Количество трутней: " + DroneBee.count);
+        droneSecText.setText(String.format("Таймер трутней: %.2f", DroneBee.countSec));
     }
 
     public void togglePlayPauseButtons(Boolean start, Boolean pause, Boolean stop) {
@@ -70,12 +91,21 @@ public class UserInterface {
         workerText = new Label("Количество рабочих пчёл: 0");
         workerText.setFont(new Font("Arial", 24));
         workerText.setTextFill(Color.GOLD);
+
+        workerSecText = new Label("Таймер рабочих пчёл: 0");
+        workerSecText.setFont(new Font("Arial", 17));
+        workerSecText.setTextFill(Color.GOLD);
         
         droneText = new Label("Количество трутней: 0");
         droneText.setFont(new Font("Arial", 24));
         droneText.setTextFill(Color.ORANGERED);
 
-        infoTextVBox = new VBox(boxGap, workerText, droneText);
+        droneSecText = new Label("Таймер трутней: 0");
+        droneSecText.setFont(new Font("Arial", 17));
+        droneSecText.setTextFill(Color.ORANGERED);
+        
+
+        infoTextVBox = new VBox(boxGap, workerText, workerSecText, droneText, droneSecText);
     }
 
     private void makePlayPauseHBox(Main main) {
@@ -108,29 +138,82 @@ public class UserInterface {
         showInfoButton.setOnAction(event -> toggleInfo());
     }
 
+    private void makeChangeFrameSecHBox(Main main) {
+        frameSecText = new Label("Частота обновления:");
+
+        frameSecInput = new TextField(Main.frameSec + "");
+        frameSecInput.textProperty().addListener((obs, oldVal, newVal)-> {
+            Main.frameSec = setDoubleInput(frameSecInput, oldVal, newVal);
+            main.setNewTimer();
+        });
+
+        frameSecHBox = new HBox(boxGap, frameSecText, frameSecInput);
+    }
+
     private void makeChangeBirthProbHBox() {
-        birthProbText = new Label("Вероятность рождения рабочей пчелы:");
+        birthProbText = new Label("Вероятность рождения раб. пчелы:");
 
         probsComboBox = new ComboBox<String>();
         for(int i = 0; i <= 100; i += 10) {
             probsComboBox.getItems().add(i + "%");
         }
-        probsComboBox.setValue(WorkerBee.birthProb * 100 + "%");
+        probsComboBox.setValue((int)(WorkerBee.birthProb * 100) + "%");
         probsComboBox.setOnAction(event -> setBirthProb(probsComboBox.getValue()));
 
         changeBirthProbHBox = new HBox(boxGap, birthProbText, probsComboBox);
     }
 
-    private void makeDroneLifeTimeHBox() {
+    private void makeChangeBirthMaxPartHBox() {
+        birthMaxPartText = new Label("Макс. часть для рождения трутней:");
+
+        partsComboBox = new ComboBox<String>();
+        for(int i = 0; i <= 100; i += 10) {
+            partsComboBox.getItems().add(i + "%");
+        }
+        partsComboBox.setValue((int)(DroneBee.birthMaxPart * 100) + "%");
+        partsComboBox.setOnAction(event -> setBirthProb(partsComboBox.getValue()));
+
+        changeBirthMaxPartHBox = new HBox(boxGap, birthMaxPartText, partsComboBox);
+    }
+
+    private void makeChangeWorkerLifeTimeHBox() {
+        workerLifeTimeText = new Label("Время жизни рабочих:");
+
+        workerLifeTimeInput = new TextField(WorkerBee.lifeTime + "");
+        workerLifeTimeInput.textProperty().addListener((obs, oldVal, newVal)-> {
+            WorkerBee.lifeTime = setDoubleInput(workerLifeTimeInput, oldVal, newVal);
+        });
+
+        workerLifeTimeHBox = new HBox(boxGap, workerLifeTimeText, workerLifeTimeInput);
+    }
+
+    private void makeChangeDroneLifeTimeHBox() {
         droneLifeTimeText = new Label("Время жизни трутней:");
 
-        droneLifeTimeInput = new TextField(DroneBee.lifeTime / Main.frameSec + "");
+        droneLifeTimeInput = new TextField(DroneBee.lifeTime + "");
         droneLifeTimeInput.textProperty().addListener((obs, oldVal, newVal)-> {
-            DroneBee.lifeTime = setDoubleInput(droneLifeTimeInput, oldVal, newVal) * Main.frameSec;
+            DroneBee.lifeTime = setDoubleInput(droneLifeTimeInput, oldVal, newVal);
         });
 
         droneLifeTimeHBox = new HBox(boxGap, droneLifeTimeText, droneLifeTimeInput);
     }
+
+    private void makeChangeWorkerBirthSecHBox() {
+        workerBirthSecText = new Label("Таймер для рождения рабочих пчёл:");
+
+        workerBirthSecInput = new TextField(WorkerBee.birthSec + "");
+
+        workerBirthSecInput.textProperty().addListener((obs, oldVal, newVal)-> {
+            WorkerBee.birthSec = setDoubleInput(workerBirthSecInput, oldVal, newVal);
+        });
+
+        workerBirthSecHBox = new HBox(boxGap, workerBirthSecText, workerBirthSecInput);
+        
+    }
+
+    
+
+    
 
     private double setDoubleInput(TextField input, String oldVal, String newVal) {
         newVal.replace(",", ".");

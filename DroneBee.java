@@ -3,8 +3,8 @@ import javafx.scene.Group;
 
 public class DroneBee extends Bee {
     static Image image = new Image("OrangeBee.png");
-    static double birthSec = 5 * Main.frameSec;
-    static double lifeTime = 70 * Main.frameSec;
+    static double birthSec = 5;
+    static double lifeTime = 70 ;
     static double birthMaxPart = 0.2;
 
     static double countSec = 0;
@@ -17,7 +17,7 @@ public class DroneBee extends Bee {
     public static void update(Group playground, Habitat habitat, double countSec1) {
         DroneBee.countSec += Main.frameSec;
         if(WorkerBee.count != 0 && ((double)DroneBee.count / (double)WorkerBee.count) < DroneBee.birthMaxPart 
-                                                        && DroneBee.countSec >= DroneBee.birthSec) {
+                                                        && DroneBee.countSec >= DroneBee.birthSec * Main.frameSec) {
             DroneBee.countSec = 0;
             habitat.addBee(new DroneBee(Habitat.imageWidth, countSec1), playground);
             DroneBee.count += 1;
@@ -25,7 +25,7 @@ public class DroneBee extends Bee {
     }
 
     public Boolean isDeleted(double countSec) {
-        if(countSec - this.birthday > DroneBee.lifeTime) {
+        if(countSec - this.birthday > DroneBee.lifeTime * Main.frameSec) {
             DroneBee.count--;
             return true;
         }
