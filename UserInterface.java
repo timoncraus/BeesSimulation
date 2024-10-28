@@ -14,7 +14,7 @@ public class UserInterface {
     static final String allowedChars = "0123456789.";
 
     ScrollPane scrollInterface;
-    public Label timeText, droneText, droneSecText, workerText, workerSecText, frameSecText, 
+    Label timeText, droneText, droneSecText, workerText, workerSecText, frameSecText, 
                             birthProbText, birthMaxPartText, droneLifeTimeText, workerLifeTimeText, workerBirthSecText;
     VBox interfaceVBox, infoTextVBox;
     HBox playPauseHBox, frameSecHBox, changeBirthProbHBox, changeBirthMaxPartHBox, 
@@ -22,10 +22,12 @@ public class UserInterface {
     Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton;
     ComboBox<String> probsComboBox, partsComboBox;
     TextField frameSecInput, droneLifeTimeInput, workerLifeTimeInput, workerBirthSecInput;
+    Font usuialFont = new Font("Arial", 24);
+    Font smallFont = new Font("Arial", 17);
 
     public UserInterface(Main main) {
         timeText = new Label("0,00 сек");
-        timeText.setFont(new Font("Arial", 24));
+        timeText.setFont(usuialFont);
 
         makeInfoTextVBox();
         makePlayPauseHBox(main);
@@ -89,19 +91,19 @@ public class UserInterface {
     
     private void makeInfoTextVBox() {
         workerText = new Label("Количество рабочих пчёл: 0");
-        workerText.setFont(new Font("Arial", 24));
+        workerText.setFont(usuialFont);
         workerText.setTextFill(Color.GOLD);
 
         workerSecText = new Label("Таймер рабочих пчёл: 0");
-        workerSecText.setFont(new Font("Arial", 17));
+        workerSecText.setFont(smallFont);
         workerSecText.setTextFill(Color.GOLD);
         
         droneText = new Label("Количество трутней: 0");
-        droneText.setFont(new Font("Arial", 24));
+        droneText.setFont(usuialFont);
         droneText.setTextFill(Color.ORANGERED);
 
         droneSecText = new Label("Таймер трутней: 0");
-        droneSecText.setFont(new Font("Arial", 17));
+        droneSecText.setFont(smallFont);
         droneSecText.setTextFill(Color.ORANGERED);
         
 
@@ -171,7 +173,7 @@ public class UserInterface {
             partsComboBox.getItems().add(i + "%");
         }
         partsComboBox.setValue((int)(DroneBee.birthMaxPart * 100) + "%");
-        partsComboBox.setOnAction(event -> setBirthProb(partsComboBox.getValue()));
+        partsComboBox.setOnAction(event -> setBirthMaxPart(partsComboBox.getValue()));
 
         changeBirthMaxPartHBox = new HBox(boxGap, birthMaxPartText, partsComboBox);
     }
@@ -252,6 +254,10 @@ public class UserInterface {
 
     private void setBirthProb(String probStrig) {
         WorkerBee.birthProb = Double.parseDouble(probStrig.replace("%", ""))/100;
+    }
+
+    private void setBirthMaxPart(String partString) {
+        DroneBee.birthMaxPart = Double.parseDouble(partString.replace("%", ""))/100;
     }
 
     private void toggleInfo() {
