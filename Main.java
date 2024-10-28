@@ -95,7 +95,7 @@ public class Main extends Application {
             new KeyFrame(Duration.seconds(frameSec), action -> {
                 habitat.update(countSec, playground);
                 countSec += frameSec;
-                userInterface.updateText(countSec);
+                userInterface.updateText(countSec, habitat.bees);
             })
         );
         timeLine.setCycleCount(100_000);

@@ -14,6 +14,10 @@ public class DroneBee extends Bee {
         super(width, image, countSec1);
     }
 
+    public String getString() {
+        return "Трутень";
+    }
+
     public static void update(Group playground, Habitat habitat, double countSec1) {
         DroneBee.countSec += Main.frameSec;
         if(WorkerBee.count != 0 && ((double)DroneBee.count / (double)WorkerBee.count) < DroneBee.birthMaxPart 

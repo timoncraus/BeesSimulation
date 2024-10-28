@@ -19,6 +19,8 @@ public abstract class Bee {
 
     public static void resetCounters() {}
 
+    public String getString() { return "Пчела"; }
+
     public Boolean isDeleted(double countSec) { return false; }
 
     public Rectangle makeRectangle(double x, double y) {

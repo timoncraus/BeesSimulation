@@ -15,6 +15,10 @@ public class WorkerBee extends Bee {
         super(width, image, countSec1);
     }
 
+    public String getString() {
+        return "Рабочая пчела";
+    }
+
     public static void update(Group playground, Habitat habitat, double countSec1) {
         probability = Habitat.random(0, 1);
         

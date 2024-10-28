@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -8,6 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class UserInterface {
     static final double boxGap = 10;
@@ -19,11 +24,12 @@ public class UserInterface {
     VBox interfaceVBox, infoTextVBox;
     HBox playPauseHBox, frameSecHBox, changeBirthProbHBox, changeBirthMaxPartHBox, 
                             droneLifeTimeHBox, workerLifeTimeHBox, workerBirthSecHBox;
-    Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton;
+    Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton, showObjectsButton;
     ComboBox<String> probsComboBox, partsComboBox;
     TextField frameSecInput, droneLifeTimeInput, workerLifeTimeInput, workerBirthSecInput;
     Font usuialFont = new Font("Arial", 24);
     Font smallFont = new Font("Arial", 17);
+    VBox rootObjects = new VBox();
 
     public UserInterface(Main main) {
         timeText = new Label("0,00 сек");
@@ -33,6 +39,7 @@ public class UserInterface {
         makePlayPauseHBox(main);
         makeShowTimeButton();
         makeShowInfoButton();
+        makeShowObjectsButton(main.habitat.bees);
         makeChangeFrameSecHBox(main);
         makeChangeBirthProbHBox();
         makeChangeBirthMaxPartHBox();
@@ -46,6 +53,7 @@ public class UserInterface {
                                 playPauseHBox, 
                                 showTimeButton, 
                                 showInfoButton,
+                                showObjectsButton,
                                 frameSecHBox, 
                                 changeBirthProbHBox,
                                 changeBirthMaxPartHBox,
@@ -62,7 +70,7 @@ public class UserInterface {
         return scrollInterface;
     }
 
-    public void updateText(double countSec) {
+    public void updateText(double countSec, ArrayList<Bee> bees) {
         timeText.setText(String.format("%.2f сек", countSec));
 
         workerText.setText("Количество рабочих пчёл: " + WorkerBee.count);
@@ -70,6 +78,8 @@ public class UserInterface {
 
         droneText.setText("Количество трутней: " + DroneBee.count);
         droneSecText.setText(String.format("Таймер трутней: %.2f", DroneBee.countSec));
+
+        updateObjects(bees);
     }
 
     public void togglePlayPauseButtons(Boolean start, Boolean pause, Boolean stop) {
@@ -138,6 +148,12 @@ public class UserInterface {
         showInfoButton = new Button();         
         showInfoButton.setText("Скрывать информацию");
         showInfoButton.setOnAction(event -> toggleInfo());
+    }
+
+    private void makeShowObjectsButton(ArrayList<Bee> bees) {
+        showObjectsButton = new Button();         
+        showObjectsButton.setText("Текущие объекты");
+        showObjectsButton.setOnAction(event -> showObjects(bees));
     }
 
     private void makeChangeFrameSecHBox(Main main) {
@@ -269,6 +285,32 @@ public class UserInterface {
         else {
             interfaceVBox.getChildren().remove(infoTextVBox);
             showInfoButton.setText("Показывать информацию");
+        }
+    }
+
+    private void showObjects(ArrayList<Bee> bees) {
+        rootObjects.setPadding(new Insets(20));
+        ScrollPane scrollObjects = new ScrollPane();
+        scrollObjects.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollObjects.setContent(rootObjects); 
+        HBox.setHgrow(scrollObjects, Priority.ALWAYS);
+
+        Scene scene = new Scene(scrollObjects, 500, 500);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Текущие объекты");
+        stage.show();
+    }
+
+    private void updateObjects(ArrayList<Bee> bees) {
+        rootObjects.getChildren().clear();
+        int n = bees.size();
+        Bee currentBee;
+        Label currentLabel;
+        for(int i = 0; i < n; i++) {
+            currentBee = bees.get(i);
+            currentLabel = new Label(String.format("%s %.2f сек", currentBee.getString(), currentBee.birthday));
+            rootObjects.getChildren().add(currentLabel);
         }
     }
 }
