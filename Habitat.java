@@ -51,7 +51,7 @@ public class Habitat {
         playground.getChildren().add(
             bee.makeRectangle(
                 random(Main.minWidthPlayground, Main.widthPlayground - bee.getWidth()), 
-                random(Main.minHeightPlayground, Main.heightWindow - bee.getHeight())
+                random(Main.minHeightPlayground, Main.heightPlayground - bee.getHeight())
             )
         );
         

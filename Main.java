@@ -1,8 +1,8 @@
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
-
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -16,40 +16,63 @@ public class Main extends Application {
 
     static final double minWidthPlayground = 0;
     static final double widthPlayground = 500;
-    static final double minHeightPlayground = 30;
+    static final double minHeightPlayground = 0;
     static final double heightPlayground = 500;
 
     static final double widthWindow = 1000;
     static final double heightWindow = 600;
 
+    
+    UserInterface menuUserInterface, userInterface;
+    HBox menuRoot, root;
+    Scene menuScene, scene;
     Group playground;
     Rectangle background;
-    HBox root;
     Timeline timeLine;
     Habitat habitat;
-    UserInterface userInterface;
-    Scene scene;
 
     double countSec = 0;
     boolean pauseGame = false;
 
+    Stage menuStage, stage;
+
     @Override
-    public void start(Stage stage) {
+    public void start(Stage menuStage1) {
+        menuStage = menuStage1;
+        habitat = new Habitat();
+        setNewTimer();
+        menuUserInterface = new UserInterface(this, true);
+        
+        menuRoot = new HBox(menuUserInterface.getInterfaceVBox());
+        menuRoot.setPadding(new Insets(20));
+        
+
+        menuScene = new Scene(menuRoot, 800, 600);
+
+        menuStage.setScene(menuScene);
+        menuStage.setTitle("Меню симуляции жизни пчёл");
+        menuStage.show();
+    }
+
+    public void openGame() {
+        menuStage.close();
+
+        userInterface = new UserInterface(this, false);
+        stage = new Stage();
+
         background = new Rectangle(widthPlayground, heightPlayground);
         background.setFill(Color.WHITE);
         playground = new Group(background);
-        habitat = new Habitat();
-        userInterface = new UserInterface(this);
 
-        setNewTimer();
+        
 
         root = new HBox(playground, userInterface.getInterfaceVBox());
         
         scene = new Scene(root, widthWindow, heightWindow);
         
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.B) play();
-            if (e.getCode() == KeyCode.E) stop();
+            if (e.getCode() == KeyCode.B) playGame();
+            if (e.getCode() == KeyCode.E) stopGame();
             if (e.getCode() == KeyCode.T) userInterface.toggleTime();
         });
 
@@ -58,7 +81,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    public void play() {
+    public void playGame() {
         userInterface.togglePlayPauseButtons(true, false, false);
 
         habitat.deleteAll(playground);
@@ -68,12 +91,12 @@ public class Main extends Application {
         timeLine.play();
     }
 
-    public void stop() {
+    public void stopGame() {
         timeLine.stop();
         userInterface.togglePlayPauseButtons(false, true, true);
     }
 
-    public void pause() {
+    public void pauseGame() {
         if(pauseGame) {
             timeLine.play();
             userInterface.togglePlayPauseButtons(true, false, false);

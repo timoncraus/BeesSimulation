@@ -18,48 +18,31 @@ public class UserInterface {
     static final double boxGap = 10;
     static final String allowedChars = "0123456789.";
 
-    ScrollPane scrollInterface;
+    ScrollPane scrollInterface, scrollMenuInterface;
     Label timeText, droneText, droneSecText, workerText, workerSecText, frameSecText, 
                             birthProbText, birthMaxPartText, droneLifeTimeText, workerLifeTimeText, workerBirthSecText;
-    VBox interfaceVBox, infoTextVBox;
+    VBox menuInterfaceVBox, interfaceVBox, infoTextVBox, gameVBox, openGameVBox, changeInfoVBox;
     HBox playPauseHBox, frameSecHBox, changeBirthProbHBox, changeBirthMaxPartHBox, 
                             droneLifeTimeHBox, workerLifeTimeHBox, workerBirthSecHBox;
-    Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton, showObjectsButton;
+    Button startButton, pauseButton, stopButton, showTimeButton, showInfoButton, showObjectsButton, openGameButton;
     ComboBox<String> probsComboBox, partsComboBox;
     TextField frameSecInput, droneLifeTimeInput, workerLifeTimeInput, workerBirthSecInput;
     Font usuialFont = new Font("Arial", 24);
     Font smallFont = new Font("Arial", 17);
     VBox rootObjects = new VBox();
 
-    public UserInterface(Main main) {
-        timeText = new Label("0,00 сек");
-        timeText.setFont(usuialFont);
+    public UserInterface(Main main, boolean isMenu) {
+        gameVBox = getGameVBox(isMenu, main);
+        changeInfoVBox = getChangeInfoVBox(main);
+        openGameVBox = getOpenGameVBox(isMenu, main);
 
-        makeInfoTextVBox();
-        makePlayPauseHBox(main);
-        makeShowTimeButton();
-        makeShowInfoButton();
-        makeShowObjectsButton(main.habitat.bees);
-        makeChangeFrameSecHBox(main);
-        makeChangeBirthProbHBox();
-        makeChangeBirthMaxPartHBox();
-        makeChangeDroneLifeTimeHBox();
-        makeChangeWorkerLifeTimeHBox();
-        makeChangeWorkerBirthSecHBox();
+        
 
         interfaceVBox = new VBox(boxGap, 
-                                timeText, 
-                                infoTextVBox, 
-                                playPauseHBox, 
-                                showTimeButton, 
-                                showInfoButton,
-                                showObjectsButton,
-                                frameSecHBox, 
-                                changeBirthProbHBox,
-                                changeBirthMaxPartHBox,
-                                workerLifeTimeHBox,
-                                droneLifeTimeHBox,
-                                workerBirthSecHBox);
+                                gameVBox,
+                                changeInfoVBox,
+                                openGameVBox);
+                                
         scrollInterface = new ScrollPane();
         scrollInterface.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollInterface.setContent(interfaceVBox); 
@@ -98,6 +81,53 @@ public class UserInterface {
             showTimeButton.setText("Показывать время");
         }
     }
+
+    private VBox getGameVBox(boolean isMenu, Main main) {
+        if(!isMenu) {
+            timeText = new Label("0,00 сек");
+            timeText.setFont(usuialFont);
+
+            makeInfoTextVBox();
+            makePlayPauseHBox(main);
+            makeShowTimeButton();
+            makeShowInfoButton();
+            makeShowObjectsButton(main.habitat.bees);
+
+            return new VBox(boxGap, 
+                            timeText, 
+                            infoTextVBox, 
+                            playPauseHBox, 
+                            showTimeButton, 
+                            showInfoButton,
+                            showObjectsButton);
+        }
+        return new VBox();
+    }
+
+    private VBox getOpenGameVBox(boolean isMenu, Main main) {
+        if(isMenu) {
+            openGameButton = new Button();        
+            openGameButton.setText("Начать симуляцию");
+            openGameButton.setOnAction(event -> main.openGame());
+            return new VBox(boxGap, openGameButton);
+        }
+        return new VBox();
+    }
+
+    private VBox getChangeInfoVBox(Main main) {
+        makeChangeFrameSecHBox(main);
+        makeChangeBirthProbHBox();
+        makeChangeBirthMaxPartHBox();
+        makeChangeDroneLifeTimeHBox();
+        makeChangeWorkerLifeTimeHBox();
+        makeChangeWorkerBirthSecHBox();
+        return new VBox(frameSecHBox, 
+                        changeBirthProbHBox,
+                        changeBirthMaxPartHBox,
+                        workerLifeTimeHBox,
+                        droneLifeTimeHBox,
+                        workerBirthSecHBox);
+    }
     
     private void makeInfoTextVBox() {
         workerText = new Label("Количество рабочих пчёл: 0");
@@ -123,17 +153,17 @@ public class UserInterface {
     private void makePlayPauseHBox(Main main) {
         startButton = new Button();         
         startButton.setText("Старт");
-        startButton.setOnAction(event -> main.play());
+        startButton.setOnAction(event -> main.playGame());
 
         pauseButton = new Button();         
         pauseButton.setText("Пауза");
         pauseButton.setDisable(true);
-        pauseButton.setOnAction(event -> main.pause());
+        pauseButton.setOnAction(event -> main.pauseGame());
 
         stopButton = new Button();         
         stopButton.setText("Стоп");
         stopButton.setDisable(true);
-        stopButton.setOnAction(event -> main.stop());
+        stopButton.setOnAction(event -> main.stopGame());
 
         playPauseHBox = new HBox(boxGap, startButton, pauseButton, stopButton);
     }
