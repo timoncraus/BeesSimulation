@@ -1,4 +1,8 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.Random;
 import javafx.scene.Group;
 
@@ -7,6 +11,8 @@ public class Habitat {
     final static double imageWidth = 30;
 
     ArrayList<Bee> bees = new ArrayList<>();
+    HashSet<Bee> hashSetBees = new HashSet<>();
+    TreeMap<Double, Bee> mapBees = new TreeMap<>(Comparator.comparingDouble(o -> o));
 
     static Random rand = new Random();
     
@@ -26,6 +32,10 @@ public class Habitat {
         DroneBee.update(playground, this, countSec);
         WorkerBee.update(playground, this, countSec);
 
+
+        Iterator<Bee> iter = hashSetBees.iterator();
+        Bee iterBee;
+
         int n = bees.size();
         int deletedCount = 0;
         Bee currentBee;
@@ -36,7 +46,24 @@ public class Habitat {
                 bees.remove(i - deletedCount);
                 deletedCount++;
             }
+
+            
+            if(iter.hasNext()) {
+                iterBee = iter.next();
+                System.out.println(iterBee);
+            }
         }
+
+        System.out.println("- - -");
+        try {
+            double lastBee = mapBees.navigableKeySet().stream().filter(o -> o > 2).findFirst().get();
+            System.out.println("Самая первая: " + lastBee + " ");
+        }
+        catch(Exception e){
+
+        }
+
+       
     }
 
     public void deleteAll(Group playground) {
@@ -56,6 +83,8 @@ public class Habitat {
         );
         
         bees.add(bee);
+        hashSetBees.add(bee);
+        mapBees.put(bee.birthday, bee);
     }
 
     static public double random(double min, double max) {
