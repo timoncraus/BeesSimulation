@@ -94,8 +94,6 @@ public class UserInterface {
             makeShowObjectsButton(main.habitat.bees);
 
             return new VBox(boxGap, 
-                            timeText, 
-                            infoTextVBox, 
                             playPauseHBox, 
                             showTimeButton, 
                             showInfoButton,
@@ -170,13 +168,13 @@ public class UserInterface {
 
     private void makeShowTimeButton() {
         showTimeButton = new Button();         
-        showTimeButton.setText("Скрывать время");
+        showTimeButton.setText("Показывать время");
         showTimeButton.setOnAction(event -> toggleTime());
     }
 
     private void makeShowInfoButton() {
         showInfoButton = new Button();         
-        showInfoButton.setText("Скрывать информацию");
+        showInfoButton.setText("Показывать информацию");
         showInfoButton.setOnAction(event -> toggleInfo());
     }
 
